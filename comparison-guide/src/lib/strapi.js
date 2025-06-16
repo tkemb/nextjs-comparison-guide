@@ -52,7 +52,7 @@ export async function getSoftwareBySlug(slug) {
 
 // Get all categories
 export async function getCategories() {
-  const data = await fetchAPI('/categories');
+  const data = await fetchAPI('/categories?populate=*');
   return data.data;
 }
 

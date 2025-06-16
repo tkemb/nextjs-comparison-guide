@@ -32,34 +32,42 @@ export default function CategoriesSection({ categories }) {
           // Handle the actual data structure from API
           const name = category?.name;
           const documentId = category?.documentId || category?.id;
-          const imageSmall = category?.image_small;
+          const imageSmall = category?.image_small?.url;
           
           return (
-            <Link
-              key={documentId || Math.random()}
-              href={`/category/${documentId}`}
-              className="group block aspect-square"
-            >
-              <div className="bg-white border border-gray-200 rounded-lg p-4 h-full flex flex-col items-center justify-center text-center hover:border-gray-300 hover:shadow-sm transition-all duration-200">
-                <div className="w-12 h-12 mb-3 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
-                  {imageSmall ? (
-                    <img 
-                      src={imageSmall.startsWith('http') ? imageSmall : `https://jolly-egg-8bf232f85b.strapiapp.com${imageSmall}`}
-                      alt={name || 'Category'}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <span className="text-2xl">
-                      {getIconEmoji(name?.toLowerCase())}
-                    </span>
-                  )}
+            <div className="group relative rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-200">
+              {imageSmall ? (
+                <img 
+                  src={imageSmall}
+                  alt={name || 'Category'}
+                  className="w-full h-auto rounded-lg"
+                />
+              ) : (
+                <div className="aspect-square bg-gray-100 flex items-center justify-center rounded-lg">
+                  <span className="text-6xl">
+                    {getIconEmoji(name?.toLowerCase())}
+                  </span>
                 </div>
-                
-                <h3 className="text-sm font-medium text-gray-900 leading-tight">
-                  {name || 'Unnamed Category'}
-                </h3>
-              </div>
-            </Link>
+              )}
+              
+              {/* Link overlay covering the entire image */}
+              <Link
+                key={documentId || Math.random()}
+                href={`/category/${documentId}`}
+                className="absolute inset-0 z-10"
+              >
+                <span className="sr-only">{name || 'Unnamed Category'}</span>
+              </Link>
+              
+              {/* Category name overlay - only show when there's no image */}
+              {!imageSmall && (
+                <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white p-2 text-center rounded-b-lg">
+                  <h3 className="text-sm font-medium leading-tight">
+                    {name || 'Unnamed Category'}
+                  </h3>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
