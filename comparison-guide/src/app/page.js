@@ -1,17 +1,11 @@
 // src/app/page.js
 
-import { getFeaturedSoftware, getCategories, getSoftware } from '@/lib/strapi';
-import { SoftwareGrid } from '@/components/SoftwareCard';
-import SearchSection from '@/components/SearchSection';
+import { getCategories } from '@/lib/strapi';
 import CategoriesSection from '@/components/CategoriesSection';
 
 export default async function HomePage() {
-  // Fetch data in parallel
-  const [featuredSoftware, categories, allSoftware] = await Promise.all([
-    getFeaturedSoftware(),
-    getCategories(),
-    getSoftware({ 'pagination[limit]': 6 }) // Limit to 6 for homepage
-  ]);
+  // Fetch categories for homepage
+  const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-white">
