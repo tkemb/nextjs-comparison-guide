@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CategoryPage() {
   const params = useParams();
   const { documentId } = params;
   const [category, setCategory] = useState(null);
-  const [articles, setArticles] = useState([]);
   const [providers, setProviders] = useState([]);
   const [useCases, setUseCases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,12 +28,6 @@ export default function CategoryPage() {
         const categoryData = await categoryResponse.json();
         setCategory(categoryData.data);
 
-        // Fetch articles for this category
-        const articlesResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/articles?filters[category][documentId][$eq]=${documentId}`);
-        if (articlesResponse.ok) {
-          const articlesData = await articlesResponse.json();
-          setArticles(articlesData.data || []);
-        }
 
         // Fetch providers for this category
         const providersResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/providers?filters[category][documentId][$eq]=${documentId}`);
@@ -165,10 +159,11 @@ export default function CategoryPage() {
             {/* Hero Image over Text Content */}
             {category.image_header?.url && (
               <div className="relative mb-8 h-64 md:h-96 overflow-hidden rounded-xl">
-                <img
+                <Image
                   src={category.image_header.url}
                   alt={category.name || 'Category'}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
             )}

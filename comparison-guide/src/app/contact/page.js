@@ -49,7 +49,7 @@ export default function ContactPage() {
       } else {
         setFormStatus('error');
       }
-    } catch (error) {
+    } catch {
       setFormStatus('error');
     }
   };
@@ -104,7 +104,7 @@ export default function ContactPage() {
               <div className="space-y-6">
                 <p className="text-lg text-gray-600">
                   Have questions about our software directory? Want to suggest a new tool? 
-                  We'd love to hear from you!
+                  We&apos;d love to hear from you!
                 </p>
                 
                 <div className="space-y-4">

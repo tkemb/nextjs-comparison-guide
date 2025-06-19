@@ -63,7 +63,7 @@ export default function AboutPage() {
             </>
           ) : (
             <>
-              <h1>About Software.Fish</h1>
+              <h1>About Comparosion Page</h1>
               <p>
                 Software.Fish is your go-to resource for discovering and comparing software tools across different categories. 
                 We help you find the perfect solution for your needs.
@@ -71,7 +71,7 @@ export default function AboutPage() {
               
               <h2>Our Mission</h2>
               <p>
-                We believe that finding the right software shouldn't be overwhelming. Our curated collection of tools 
+                We believe that finding the right software shouldn&apos;t be overwhelming. Our curated collection of tools 
                 and detailed comparisons help you make informed decisions quickly and confidently.
               </p>
               
@@ -85,7 +85,7 @@ export default function AboutPage() {
               
               <h2>Get in Touch</h2>
               <p>
-                Have questions or suggestions? We'd love to hear from you. 
+                Have questions or suggestions? We&apos;d love to hear from you. 
                 <Link href="/contact" className="text-blue-600 hover:underline"> Contact us</Link> anytime.
               </p>
             </>
