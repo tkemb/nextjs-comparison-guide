@@ -47,7 +47,7 @@ function CategoryCard({ name, slug, documentId, imageUrl }) {
 
   return (
     <Link href={`/category/${slug || documentId}`} className="group">
-      <div className="relative bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden h-32">
+      <div className="relative bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden h-32 group-hover:scale-105">
         <div className="absolute inset-0">
           <img
             src={imageUrl}
