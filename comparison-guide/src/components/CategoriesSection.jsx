@@ -35,7 +35,10 @@ export default function CategoriesSection({ categories }) {
           const imageSmall = category?.image_small?.url;
           
           return (
-            <div className="group relative rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-200">
+            <div 
+              key={documentId || Math.random()}
+              className="group relative rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-200"
+            >
               {imageSmall ? (
                 <img 
                   src={imageSmall}
@@ -52,7 +55,6 @@ export default function CategoriesSection({ categories }) {
               
               {/* Link overlay covering the entire image */}
               <Link
-                key={documentId || Math.random()}
                 href={`/category/${documentId}`}
                 className="absolute inset-0 z-10"
               >

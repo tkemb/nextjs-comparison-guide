@@ -2,6 +2,7 @@
 
 import { getCategories } from '@/lib/strapi';
 import CategoriesSection from '@/components/CategoriesSection';
+import Link from 'next/link';
 
 export default async function HomePage() {
   // Fetch categories for homepage
@@ -20,8 +21,8 @@ export default async function HomePage() {
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Categories</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
+              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link>
+              <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
             </nav>
           </div>
         </div>
