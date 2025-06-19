@@ -1,0 +1,133 @@
+// src/components/Layout.jsx
+
+'use client';
+
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+
+export default function Layout({ children }) {
+  const [categories, setCategories] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORIES);
+        setCategories(data.data || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-gray-900">
+                Comparison
+              </Link>
+            </div>
+            <nav className="hidden md:flex space-x-8">
+              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">Home</Link>
+              
+              {/* Categories Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setShowDropdown(true)}
+                onMouseLeave={() => setShowDropdown(false)}
+              >
+                <div className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1 cursor-pointer">
+                  Categories
+                  <svg className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                
+                {showDropdown && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      {categories.length > 0 ? (
+                        categories.map((category) => (
+                          <Link
+                            key={category.documentId}
+                            href={`/category/${category.slug || category.documentId}`}
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                          >
+                            {category.name || 'Unnamed Category'}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-gray-500 text-sm">Loading categories...</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {children}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-100 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-sm text-gray-600 hover:text-gray-900">About</Link></li>
+                <li><Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Categories</h3>
+              <ul className="space-y-2">
+                {categories.slice(0, 3).map((category) => (
+                  <li key={category.documentId}>
+                    <Link href={`/category/${category.slug || category.documentId}`} className="text-sm text-gray-600 hover:text-gray-900">
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Resources</h3>
+              <ul className="space-y-2">
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Blog</Link></li>
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Help</Link></li>
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">API</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Connect</h3>
+              <ul className="space-y-2">
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Twitter</Link></li>
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">LinkedIn</Link></li>
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">GitHub</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-100 mt-8 pt-8 text-center">
+            <p className="text-sm text-gray-600">&copy; 2025 Software.Fish. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

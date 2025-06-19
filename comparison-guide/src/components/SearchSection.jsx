@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 
 export default function SearchSection() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,11 +15,11 @@ export default function SearchSection() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://jolly-egg-8bf232f85b.strapiapp.com/api/categories');
-        const data = await response.json();
+        const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORIES);
         setCategories(data.data || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -35,7 +36,7 @@ export default function SearchSection() {
   };
 
   const handleCategoryClick = (category) => {
-    router.push(`/category/${category.documentId}`);
+    router.push(`/category/${category.slug || category.documentId}`);
   };
 
   return (

@@ -6,6 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'https://jolly-egg-8bf232f
 async function fetchAPI(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
   
+  // Log the API URL being called (shows in terminal for server-side calls)
+  console.log(`🌐 Strapi API Call: ${url}`);
+  
   try {
     const response = await fetch(url, {
       headers: {
@@ -16,14 +19,15 @@ async function fetchAPI(endpoint, options = {}) {
     });
 
     if (!response.ok) {
-      console.warn(`Strapi API error on ${endpoint}: ${response.status}`);
+      console.warn(`❌ Strapi API error on ${endpoint}: ${response.status}`);
       return { data: [] }; // Return empty data structure
     }
 
     const data = await response.json();
+    console.log(`✅ Strapi API Success: ${url}`);
     return data;
   } catch (error) {
-    console.warn(`Strapi API connection failed on ${endpoint}:`, error.message);
+    console.warn(`❌ Strapi API connection failed on ${endpoint}:`, error.message);
     return { data: [] }; // Return empty data structure
   }
 }

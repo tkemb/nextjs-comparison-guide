@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 
 export default function ArticlePage() {
   const params = useParams();
-  const { documentId } = params;
+  const { slug } = params;
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,12 +17,14 @@ export default function ArticlePage() {
       try {
         setLoading(true);
         
-        const response = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/articles/${documentId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch article');
+        // Fetch article by slug
+        const data = await fetchFromStrapi(API_ENDPOINTS.ARTICLE_BY_SLUG(slug));
+        
+        if (!data.data || data.data.length === 0) {
+          throw new Error('Article not found');
         }
-        const data = await response.json();
-        setArticle(data.data);
+        
+        setArticle(data.data[0]);
         
       } catch (err) {
         setError(err.message);
@@ -30,10 +33,10 @@ export default function ArticlePage() {
       }
     };
 
-    if (documentId) {
+    if (slug) {
       fetchArticle();
     }
-  }, [documentId]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -86,7 +89,7 @@ export default function ArticlePage() {
               <>
                 <span className="text-gray-400">/</span>
                 <Link 
-                  href={`/category/${article.category.documentId}`}
+                  href={`/category/${article.category.slug || article.category.documentId}`}
                   className="text-blue-600 hover:underline"
                 >
                   {article.category.name}

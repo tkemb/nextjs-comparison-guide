@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 
 export default function UseCasePage() {
   const params = useParams();
-  const { documentId } = params;
+  const { slug } = params;
   const [useCase, setUseCase] = useState(null);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,20 +18,23 @@ export default function UseCasePage() {
       try {
         setLoading(true);
         
-        // Fetch use case details
-        const useCaseResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/use-cases/${documentId}?populate=*`);
-        if (!useCaseResponse.ok) {
-          throw new Error('Failed to fetch use case');
+        // Fetch use case details by slug
+        const useCaseData = await fetchFromStrapi(API_ENDPOINTS.USE_CASE_BY_SLUG(slug));
+        
+        if (!useCaseData.data || useCaseData.data.length === 0) {
+          throw new Error('Use case not found');
         }
-        const useCaseData = await useCaseResponse.json();
-        setUseCase(useCaseData.data);
+        
+        const useCaseItem = useCaseData.data[0];
+        setUseCase(useCaseItem);
 
         // Fetch category details if use case has a category
-        if (useCaseData.data?.category?.documentId) {
-          const categoryResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/categories/${useCaseData.data.category.documentId}`);
-          if (categoryResponse.ok) {
-            const categoryData = await categoryResponse.json();
+        if (useCaseItem?.category?.documentId) {
+          try {
+            const categoryData = await fetchFromStrapi(`/categories/${useCaseItem.category.documentId}`);
             setCategory(categoryData.data);
+          } catch (error) {
+            console.warn('Failed to fetch category:', error);
           }
         }
         
@@ -41,10 +45,10 @@ export default function UseCasePage() {
       }
     };
 
-    if (documentId) {
+    if (slug) {
       fetchUseCaseData();
     }
-  }, [documentId]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -96,7 +100,7 @@ export default function UseCasePage() {
             {category && (
               <>
                 <span className="text-gray-400">/</span>
-                <Link href={`/category/${category.documentId}`} className="text-blue-600 hover:underline">
+                <Link href={`/category/${category.slug || category.documentId}`} className="text-blue-600 hover:underline">
                   {category.name}
                 </Link>
               </>
@@ -175,7 +179,7 @@ export default function UseCasePage() {
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-500 mb-1">Category</h4>
                     <Link 
-                      href={`/category/${category.documentId}`}
+                      href={`/category/${category.slug || category.documentId}`}
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                     >
                       {category.name}

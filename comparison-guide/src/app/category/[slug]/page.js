@@ -1,46 +1,71 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+import { getStrapiImageUrl } from '@/lib/strapi';
+import Layout from '@/components/Layout';
 
 export default function CategoryPage() {
   const params = useParams();
-  const { documentId } = params;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { slug } = params;
   const [category, setCategory] = useState(null);
   const [providers, setProviders] = useState([]);
   const [useCases, setUseCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Get active tab from URL parameter, default to 'overview'
+  const activeTab = searchParams.get('tab') || 'overview';
+
+  // Function to update URL when tab changes
+  const handleTabChange = (newTab) => {
+    const params = new URLSearchParams(searchParams);
+    if (newTab === 'overview') {
+      params.delete('tab'); // Remove tab param for default tab
+    } else {
+      params.set('tab', newTab);
+    }
+    
+    const newUrl = params.toString() ? `?${params.toString()}` : '';
+    router.push(`/category/${slug}${newUrl}`, { scroll: false });
+  };
 
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
         setLoading(true);
         
-        // Fetch category details
-        const categoryResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/categories/${documentId}?populate=*`);
-        if (!categoryResponse.ok) {
-          throw new Error('Failed to fetch category');
+        // Fetch category details by slug
+        const categoryData = await fetchFromStrapi(API_ENDPOINTS.CATEGORY_BY_SLUG(slug));
+        
+        if (!categoryData.data || categoryData.data.length === 0) {
+          throw new Error('Category not found');
         }
-        const categoryData = await categoryResponse.json();
-        setCategory(categoryData.data);
+        
+        const categoryItem = categoryData.data[0];
+        setCategory(categoryItem);
 
-
-        // Fetch providers for this category
-        const providersResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/providers?filters[category][documentId][$eq]=${documentId}`);
-        if (providersResponse.ok) {
-          const providersData = await providersResponse.json();
+        // Fetch providers for this category using category documentId
+        try {
+          const providersData = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(categoryItem.documentId));
           setProviders(providersData.data || []);
+        } catch (error) {
+          console.warn('Failed to fetch providers:', error);
+          setProviders([]);
         }
 
-        // Fetch use-cases for this category
-        const useCasesResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/use-cases?filters[category][documentId][$eq]=${documentId}`);
-        if (useCasesResponse.ok) {
-          const useCasesData = await useCasesResponse.json();
+        // Fetch use-cases for this category using category documentId
+        try {
+          const useCasesData = await fetchFromStrapi(API_ENDPOINTS.USE_CASES_BY_CATEGORY(categoryItem.documentId));
           setUseCases(useCasesData.data || []);
+        } catch (error) {
+          console.warn('Failed to fetch use cases:', error);
+          setUseCases([]);
         }
         
       } catch (err) {
@@ -50,10 +75,10 @@ export default function CategoryPage() {
       }
     };
 
-    if (documentId) {
+    if (slug) {
       fetchCategoryData();
     }
-  }, [documentId]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -94,15 +119,11 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+      <div className="bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/" className="text-blue-600 hover:underline">
-              ← Back to Home
-            </Link>
-          </div>
           <h1 className="text-3xl font-bold text-gray-900">
             {category.name || 'Category'}
           </h1>
@@ -119,7 +140,7 @@ export default function CategoryPage() {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setActiveTab('overview')}
+              onClick={() => handleTabChange('overview')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'overview'
                   ? 'border-blue-500 text-blue-600'
@@ -129,7 +150,7 @@ export default function CategoryPage() {
               Overview
             </button>
             <button
-              onClick={() => setActiveTab('providers')}
+              onClick={() => handleTabChange('providers')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'providers'
                   ? 'border-blue-500 text-blue-600'
@@ -139,7 +160,7 @@ export default function CategoryPage() {
               Providers ({providers.length})
             </button>
             <button
-              onClick={() => setActiveTab('use-cases')}
+              onClick={() => handleTabChange('use-cases')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'use-cases'
                   ? 'border-blue-500 text-blue-600'
@@ -157,10 +178,10 @@ export default function CategoryPage() {
         {activeTab === 'overview' && (
           <div>
             {/* Hero Image over Text Content */}
-            {category.image_header?.url && (
+            {getStrapiImageUrl(category.image_header) && (
               <div className="relative mb-8 h-64 md:h-96 overflow-hidden rounded-xl">
                 <Image
-                  src={category.image_header.url}
+                  src={getStrapiImageUrl(category.image_header)}
                   alt={category.name || 'Category'}
                   fill
                   className="object-cover"
@@ -199,20 +220,37 @@ export default function CategoryPage() {
                 {providers.map((provider) => (
                   <Link
                     key={provider.documentId}
-                    href={`/provider/${provider.documentId}`}
+                    href={`/provider/${provider.slug || provider.documentId}`}
                     className="group block"
                   >
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {provider.name || 'Untitled Provider'}
-                      </h3>
-                      {provider.description && (
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                          {provider.description}
-                        </p>
+                    <div className="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105 overflow-hidden">
+                      {provider.logo ? (
+                        <div className="aspect-square flex items-center justify-center p-8 bg-gray-50">
+                          <img
+                            src={getStrapiImageUrl(provider.logo)}
+                            alt={`${provider.name || 'Provider'} logo`}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-square flex items-center justify-center p-8 bg-gray-100">
+                          <div className="text-center">
+                            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-3 mx-auto">
+                              <span className="text-white font-bold text-xl">
+                                {(provider.name || 'Provider').charAt(0)}
+                              </span>
+                            </div>
+                            <h3 className="text-sm font-medium text-gray-900">
+                              {provider.name || 'Untitled Provider'}
+                            </h3>
+                          </div>
+                        </div>
                       )}
-                      <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">
-                        View provider →
+                      
+                      <div className="p-4 bg-white">
+                        <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-center">
+                          {provider.name || 'Untitled Provider'}
+                        </h3>
                       </div>
                     </div>
                   </Link>
@@ -241,7 +279,7 @@ export default function CategoryPage() {
                 {useCases.map((useCase) => (
                   <Link
                     key={useCase.documentId}
-                    href={`/use-case/${useCase.documentId}`}
+                    href={`/use-case/${useCase.slug || useCase.documentId}`}
                     className="group block"
                   >
                     <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105">
@@ -273,6 +311,7 @@ export default function CategoryPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

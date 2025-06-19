@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+import { getStrapiImageUrl } from '@/lib/strapi';
+import Layout from '@/components/Layout';
 
 export default function ProviderPage() {
   const params = useParams();
-  const { documentId } = params;
+  const { slug } = params;
   const [provider, setProvider] = useState(null);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,20 +20,23 @@ export default function ProviderPage() {
       try {
         setLoading(true);
         
-        // Fetch provider details
-        const providerResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/providers/${documentId}?populate=*`);
-        if (!providerResponse.ok) {
-          throw new Error('Failed to fetch provider');
+        // Fetch provider details by slug
+        const providerData = await fetchFromStrapi(API_ENDPOINTS.PROVIDER_BY_SLUG(slug));
+        
+        if (!providerData.data || providerData.data.length === 0) {
+          throw new Error('Provider not found');
         }
-        const providerData = await providerResponse.json();
-        setProvider(providerData.data);
+        
+        const providerItem = providerData.data[0];
+        setProvider(providerItem);
 
         // Fetch category details if provider has a category
-        if (providerData.data?.category?.documentId) {
-          const categoryResponse = await fetch(`https://jolly-egg-8bf232f85b.strapiapp.com/api/categories/${providerData.data.category.documentId}`);
-          if (categoryResponse.ok) {
-            const categoryData = await categoryResponse.json();
+        if (providerItem?.category?.documentId) {
+          try {
+            const categoryData = await fetchFromStrapi(`/categories/${providerItem.category.documentId}`);
             setCategory(categoryData.data);
+          } catch (error) {
+            console.warn('Failed to fetch category:', error);
           }
         }
         
@@ -41,10 +47,10 @@ export default function ProviderPage() {
       }
     };
 
-    if (documentId) {
+    if (slug) {
       fetchProviderData();
     }
-  }, [documentId]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -85,9 +91,10 @@ export default function ProviderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+      <div className="bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-4 mb-4">
             <Link href="/" className="text-blue-600 hover:underline">
@@ -96,15 +103,26 @@ export default function ProviderPage() {
             {category && (
               <>
                 <span className="text-gray-400">/</span>
-                <Link href={`/category/${category.documentId}`} className="text-blue-600 hover:underline">
+                <Link href={`/category/${category.slug || category.documentId}`} className="text-blue-600 hover:underline">
                   {category.name}
                 </Link>
               </>
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {provider.name || 'Provider'}
-          </h1>
+          <div className="flex items-center gap-4">
+            {provider.logo && (
+              <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                <img
+                  src={getStrapiImageUrl(provider.logo)}
+                  alt={`${provider.name || 'Provider'} logo`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <h1 className="text-3xl font-bold text-gray-900">
+              {provider.name || 'Provider'}
+            </h1>
+          </div>
           {provider.description && (
             <p className="text-lg text-gray-600 mt-2">
               {provider.description}
@@ -162,7 +180,7 @@ export default function ProviderPage() {
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-500 mb-1">Category</h3>
                   <Link 
-                    href={`/category/${category.documentId}`}
+                    href={`/category/${category.slug || category.documentId}`}
                     className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                   >
                     {category.name}
@@ -194,6 +212,7 @@ export default function ProviderPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

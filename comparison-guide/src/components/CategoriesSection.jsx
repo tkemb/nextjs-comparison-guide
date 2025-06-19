@@ -1,78 +1,65 @@
 // src/components/CategoriesSection.jsx
 
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
+import { getStrapiImageUrl } from '@/lib/strapi';
 
 export default function CategoriesSection({ categories }) {
   if (!categories || categories.length === 0) {
     return null;
   }
 
-  const getIconEmoji = (iconName) => {
-    const iconMap = {
-      'design': '🎨',
-      'productivity': '⚡',
-      'communication': '💬',
-      'analytics': '📊',
-      'development': '💻',
-      'marketing': '📢',
-      'finance': '💰',
-      'crm': '👥',
-      'project-management': '📋',
-      'security': '🔒',
-      'default': '📁'
-    };
-    
-    return iconMap[iconName?.toLowerCase()] || iconMap.default;
-  };
 
   return (
     <section className="py-8">
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {categories.map((category) => {
-          // Handle the actual data structure from API
-          const name = category?.name;
+          const name = category?.name || 'Unnamed Category';
+          const slug = category?.slug;
           const documentId = category?.documentId || category?.id;
-          const imageSmall = category?.image_small?.url;
+          const imageUrl = getStrapiImageUrl(category?.image_small);
           
           return (
-            <div 
+            <CategoryCard
               key={documentId || Math.random()}
-              className="group relative rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-200"
-            >
-              {imageSmall ? (
-                <img 
-                  src={imageSmall}
-                  alt={name || 'Category'}
-                  className="w-full h-auto rounded-lg"
-                />
-              ) : (
-                <div className="aspect-square bg-gray-100 flex items-center justify-center rounded-lg">
-                  <span className="text-6xl">
-                    {getIconEmoji(name?.toLowerCase())}
-                  </span>
-                </div>
-              )}
-              
-              {/* Link overlay covering the entire image */}
-              <Link
-                href={`/category/${documentId}`}
-                className="absolute inset-0 z-10"
-              >
-                <span className="sr-only">{name || 'Unnamed Category'}</span>
-              </Link>
-              
-              {/* Category name overlay - only show when there's no image */}
-              {!imageSmall && (
-                <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white p-2 text-center rounded-b-lg">
-                  <h3 className="text-sm font-medium leading-tight">
-                    {name || 'Unnamed Category'}
-                  </h3>
-                </div>
-              )}
-            </div>
+              name={name}
+              slug={slug}
+              documentId={documentId}
+              imageUrl={imageUrl}
+            />
           );
         })}
       </div>
     </section>
+  );
+}
+
+function CategoryCard({ name, slug, documentId, imageUrl }) {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const showImage = imageUrl && !imageError;
+
+  return (
+    <Link href={`/category/${slug || documentId}`} className="group">
+      <div className="relative bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden h-32">
+        <div className="absolute inset-0">
+          <img
+            src={imageUrl}
+            alt={name}
+            onError={handleImageError}
+            className="w-full h-full object-cover"
+          />
+        </div>
+     
+        {/* Screen reader text */}
+        <span className="sr-only">View {name} category</span>
+      </div>
+    </Link>
   );
 }

@@ -38,7 +38,7 @@ export default function SoftwareCard({ software }) {
         {/* Actions */}
         <div className="flex space-x-3">
           <Link 
-            href={`/articles/${documentId}`}
+            href={`/article/${slug || documentId}`}
             className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
           >
             Read Article

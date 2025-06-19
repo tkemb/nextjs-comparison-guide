@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+import Layout from '@/components/Layout';
 
 export default function ContactPage() {
   const [pageData, setPageData] = useState(null);
@@ -17,11 +19,11 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        const response = await fetch('https://jolly-egg-8bf232f85b.strapiapp.com/api/pages?filters[slug][$eq]=contact&populate=*');
-        const data = await response.json();
+        const data = await fetchFromStrapi(API_ENDPOINTS.PAGE_BY_SLUG('contact'));
         setPageData(data.data[0] || null);
       } catch (error) {
         console.error('Error fetching contact page:', error);
+        setPageData(null);
       } finally {
         setLoading(false);
       }
@@ -63,34 +65,19 @@ export default function ContactPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+      <Layout>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Software.Fish
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">Home</Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link>
-              <Link href="/contact" className="text-gray-900 font-medium">Contact</Link>
-              <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <Layout>
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -210,6 +197,6 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }
