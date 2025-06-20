@@ -335,7 +335,7 @@ export default function CategoryPage() {
                         >
                           <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                             {provider.logo ? (
-                              <div className="w-18 h-18 rounded-xl overflow-hidden border border-gray-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm">
+                              <div className="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <img
                                   src={getStrapiImageUrl(provider.logo)}
                                   alt={`${provider.name || 'Provider'} logo`}
@@ -343,8 +343,8 @@ export default function CategoryPage() {
                                 />
                               </div>
                             ) : (
-                              <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                                <span className="text-white font-bold text-xl">
+                              <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <span className="text-white font-bold text-lg">
                                   {(provider.name || 'P').charAt(0)}
                                 </span>
                               </div>
