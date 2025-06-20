@@ -333,33 +333,33 @@ export default function CategoryPage() {
                           href={`/provider/${provider.slug || provider.documentId}`}
                           className="group block"
                         >
-                          <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                             {provider.logo ? (
-                              <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                              <div className="w-18 h-18 rounded-xl overflow-hidden border border-gray-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <img
                                   src={getStrapiImageUrl(provider.logo)}
                                   alt={`${provider.name || 'Provider'} logo`}
-                                  className="w-full h-full object-cover"
+                                  className="max-w-full max-h-full object-contain"
                                 />
                               </div>
                             ) : (
-                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                                <span className="text-white font-bold text-sm">
+                              <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <span className="text-white font-bold text-xl">
                                   {(provider.name || 'P').charAt(0)}
                                 </span>
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                              <h4 className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate">
                                 {provider.name || 'Untitled Provider'}
                               </h4>
                               {provider.rating && (
-                                <div className="flex items-center gap-1 mt-1">
+                                <div className="flex items-center gap-1 mt-2">
                                   <div className="flex">
                                     {[...Array(5)].map((_, i) => (
                                       <svg
                                         key={i}
-                                        className={`w-3 h-3 ${
+                                        className={`w-4 h-4 ${
                                           i < Math.floor(provider.rating)
                                             ? 'text-yellow-400'
                                             : 'text-gray-300'
@@ -371,7 +371,7 @@ export default function CategoryPage() {
                                       </svg>
                                     ))}
                                   </div>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-sm text-gray-500 ml-1">
                                     {provider.rating.toFixed(1)}
                                   </span>
                                 </div>
