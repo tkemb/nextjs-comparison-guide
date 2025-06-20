@@ -86,7 +86,7 @@ export default function Layout({ children }) {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left max-w-4xl mx-auto">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
               <ul className="space-y-2">
@@ -107,14 +107,6 @@ export default function Layout({ children }) {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Blog</Link></li>
-                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Help</Link></li>
-                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">API</Link></li>
-              </ul>
-            </div>
-            <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Connect</h3>
               <ul className="space-y-2">
                 <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900">Twitter</Link></li>
@@ -124,7 +116,10 @@ export default function Layout({ children }) {
             </div>
           </div>
           <div className="border-t border-gray-100 mt-8 pt-8 text-center">
-            <p className="text-sm text-gray-600">&copy; 2025 Software.Fish. All rights reserved.</p>
+            <p className="text-sm text-gray-600">
+              &copy; 2025 Software.Fish. All rights reserved. | 
+              <Link href="/imprint" className="text-gray-600 hover:text-gray-900 ml-1">Imprint</Link>
+            </p>
           </div>
         </div>
       </footer>
