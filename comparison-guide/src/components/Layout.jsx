@@ -117,7 +117,7 @@ export default function Layout({ children }) {
           </div>
           <div className="border-t border-gray-100 mt-8 pt-8 text-center">
             <p className="text-sm text-gray-600">
-              &copy; 2025 Software.Fish. All rights reserved. | 
+              &copy; 2025 Performance3 All rights reserved. | 
               <Link href="/imprint" className="text-gray-600 hover:text-gray-900 ml-1">Imprint</Link>
             </p>
           </div>

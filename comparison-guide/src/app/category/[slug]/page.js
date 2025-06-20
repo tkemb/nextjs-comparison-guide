@@ -320,7 +320,7 @@ export default function CategoryPage() {
             <div className="sticky top-8">
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Top Providers
+                  Top Providers 2025
                 </h3>
                 {providers.length > 0 ? (
                   <div className="space-y-3">
