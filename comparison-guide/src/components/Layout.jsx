@@ -4,16 +4,21 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+import { cachedAPI } from '@/lib/cached-api';
 
 export default function Layout({ children }) {
   const [categories, setCategories] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // Preload category data on hover
+  const handleCategoryHover = (categorySlug) => {
+    cachedAPI.preloadCategory(categorySlug);
+  };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORIES);
+        const data = await cachedAPI.getCategories();
         setCategories(data.data || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -60,6 +65,7 @@ export default function Layout({ children }) {
                             key={category.documentId}
                             href={`/category/${category.slug || category.documentId}`}
                             className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                            onMouseEnter={() => handleCategoryHover(category.slug || category.documentId)}
                           >
                             {category.name || 'Unnamed Category'}
                           </Link>
@@ -99,7 +105,11 @@ export default function Layout({ children }) {
               <ul className="space-y-2">
                 {categories.slice(0, 3).map((category) => (
                   <li key={category.documentId}>
-                    <Link href={`/category/${category.slug || category.documentId}`} className="text-sm text-gray-600 hover:text-gray-900">
+                    <Link 
+                      href={`/category/${category.slug || category.documentId}`} 
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                      onMouseEnter={() => handleCategoryHover(category.slug || category.documentId)}
+                    >
                       {category.name}
                     </Link>
                   </li>

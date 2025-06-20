@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
+import { cachedAPI } from '@/lib/cached-api';
 
 export default function ProviderPage() {
   const params = useParams();
@@ -17,36 +17,22 @@ export default function ProviderPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleProviderHover = (providerSlug) => {
+    cachedAPI.preloadProvider(providerSlug);
+  };
+
   useEffect(() => {
     const fetchProviderData = async () => {
       try {
         setLoading(true);
         
-        // Fetch provider details by slug
-        const providerData = await fetchFromStrapi(API_ENDPOINTS.PROVIDER_BY_SLUG(slug));
+        // Use cached API for optimized data fetching
+        const { provider: providerItem, category: categoryData, relatedProviders: relatedData } = 
+          await cachedAPI.getProviderWithRelatedData(slug);
         
-        if (!providerData.data || providerData.data.length === 0) {
-          throw new Error('Provider not found');
-        }
-        
-        const providerItem = providerData.data[0];
         setProvider(providerItem);
-
-        // Fetch category details if provider has a category
-        if (providerItem?.category?.documentId) {
-          try {
-            const categoryData = await fetchFromStrapi(`/categories/${providerItem.category.documentId}`);
-            setCategory(categoryData.data);
-
-            // Fetch related providers from the same category
-            const relatedProvidersData = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(providerItem.category.documentId));
-            // Filter out the current provider
-            const filteredProviders = (relatedProvidersData.data || []).filter(p => p.documentId !== providerItem.documentId);
-            setRelatedProviders(filteredProviders);
-          } catch (error) {
-            console.warn('Failed to fetch category or related providers:', error);
-          }
-        }
+        setCategory(categoryData);
+        setRelatedProviders(relatedData);
         
       } catch (err) {
         setError(err.message);
@@ -315,6 +301,7 @@ export default function ProviderPage() {
                             key={relatedProvider.documentId}
                             href={`/provider/${relatedProvider.slug || relatedProvider.documentId}`}
                             className="group block"
+                            onMouseEnter={() => handleProviderHover(relatedProvider.slug || relatedProvider.documentId)}
                           >
                             <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                               {relatedProvider.logo ? (

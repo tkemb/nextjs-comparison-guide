@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
+import { cachedAPI } from '@/lib/cached-api';
 
 export default function UseCasePage() {
   const params = useParams();
@@ -17,34 +17,22 @@ export default function UseCasePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleProviderHover = (providerSlug) => {
+    cachedAPI.preloadProvider(providerSlug);
+  };
+
   useEffect(() => {
     const fetchUseCaseData = async () => {
       try {
         setLoading(true);
         
-        // Fetch use case details by slug
-        const useCaseData = await fetchFromStrapi(API_ENDPOINTS.USE_CASE_BY_SLUG(slug));
+        // Use cached API for optimized data fetching
+        const { useCase: useCaseItem, category: categoryData, relatedProviders: providersData } = 
+          await cachedAPI.getUseCaseWithRelatedData(slug);
         
-        if (!useCaseData.data || useCaseData.data.length === 0) {
-          throw new Error('Use case not found');
-        }
-        
-        const useCaseItem = useCaseData.data[0];
         setUseCase(useCaseItem);
-
-        // Fetch category details if use case has a category
-        if (useCaseItem?.category?.documentId) {
-          try {
-            const categoryData = await fetchFromStrapi(`/categories/${useCaseItem.category.documentId}`);
-            setCategory(categoryData.data);
-
-            // Fetch related providers from the same category
-            const providersData = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(useCaseItem.category.documentId));
-            setRelatedProviders(providersData.data || []);
-          } catch (error) {
-            console.warn('Failed to fetch category or related providers:', error);
-          }
-        }
+        setCategory(categoryData);
+        setRelatedProviders(providersData);
         
       } catch (err) {
         setError(err.message);
@@ -303,6 +291,7 @@ export default function UseCasePage() {
                             key={provider.documentId}
                             href={`/provider/${provider.slug || provider.documentId}`}
                             className="group block"
+                            onMouseEnter={() => handleProviderHover(provider.slug || provider.documentId)}
                           >
                             <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                               {provider.logo ? (

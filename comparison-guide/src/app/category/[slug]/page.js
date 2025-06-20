@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
+import { cachedAPI } from '@/lib/cached-api';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -18,6 +18,15 @@ export default function CategoryPage() {
   const [useCases, setUseCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Preload related content on hover
+  const handleProviderHover = (providerSlug) => {
+    cachedAPI.preloadProvider(providerSlug);
+  };
+
+  const handleUseCaseHover = (useCaseSlug) => {
+    cachedAPI.preloadUseCase(useCaseSlug);
+  };
   
   // Get active tab from URL parameter, default to 'overview'
   const activeTab = searchParams.get('tab') || 'overview';
@@ -40,33 +49,13 @@ export default function CategoryPage() {
       try {
         setLoading(true);
         
-        // Fetch category details by slug
-        const categoryData = await fetchFromStrapi(API_ENDPOINTS.CATEGORY_BY_SLUG(slug));
+        // Use cached API for optimized data fetching
+        const { category: categoryItem, providers: providersData, useCases: useCasesData } = 
+          await cachedAPI.getCategoryWithRelatedData(slug);
         
-        if (!categoryData.data || categoryData.data.length === 0) {
-          throw new Error('Category not found');
-        }
-        
-        const categoryItem = categoryData.data[0];
         setCategory(categoryItem);
-
-        // Fetch providers for this category using category documentId
-        try {
-          const providersData = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(categoryItem.documentId));
-          setProviders(providersData.data || []);
-        } catch (error) {
-          console.warn('Failed to fetch providers:', error);
-          setProviders([]);
-        }
-
-        // Fetch use-cases for this category using category documentId
-        try {
-          const useCasesData = await fetchFromStrapi(API_ENDPOINTS.USE_CASES_BY_CATEGORY(categoryItem.documentId));
-          setUseCases(useCasesData.data || []);
-        } catch (error) {
-          console.warn('Failed to fetch use cases:', error);
-          setUseCases([]);
-        }
+        setProviders(providersData);
+        setUseCases(useCasesData);
         
       } catch (err) {
         setError(err.message);
@@ -225,6 +214,7 @@ export default function CategoryPage() {
                     key={provider.documentId}
                     href={`/provider/${provider.slug || provider.documentId}`}
                     className="group block"
+                    onMouseEnter={() => handleProviderHover(provider.slug || provider.documentId)}
                   >
                     <div className="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105 overflow-hidden">
                       {provider.logo ? (
@@ -286,6 +276,7 @@ export default function CategoryPage() {
                     key={useCase.documentId}
                     href={`/use-case/${useCase.slug || useCase.documentId}`}
                     className="group block"
+                    onMouseEnter={() => handleUseCaseHover(useCase.slug || useCase.documentId)}
                   >
                     <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
@@ -334,6 +325,7 @@ export default function CategoryPage() {
                           key={provider.documentId}
                           href={`/provider/${provider.slug || provider.documentId}`}
                           className="group block"
+                          onMouseEnter={() => handleProviderHover(provider.slug || provider.documentId)}
                         >
                           <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                             {provider.logo ? (
