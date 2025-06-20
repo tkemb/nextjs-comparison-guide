@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
@@ -128,9 +129,11 @@ export default function ProviderPage() {
                 {/* Logo */}
                 {provider.logo && (
                   <div className="w-24 h-24 rounded-xl overflow-hidden border border-gray-200 bg-white p-3 flex items-center justify-center flex-shrink-0 shadow-sm">
-                    <img
+                    <Image
                       src={getStrapiImageUrl(provider.logo)}
                       alt={`${provider.name || 'Provider'} logo`}
+                      width={96}
+                      height={96}
                       className="max-w-full max-h-full object-contain"
                     />
                   </div>
@@ -316,9 +319,11 @@ export default function ProviderPage() {
                             <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                               {relatedProvider.logo ? (
                                 <div className="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm">
-                                  <img
+                                  <Image
                                     src={getStrapiImageUrl(relatedProvider.logo)}
                                     alt={`${relatedProvider.name || 'Provider'} logo`}
+                                    width={56}
+                                    height={56}
                                     className="max-w-full max-h-full object-contain"
                                   />
                                 </div>

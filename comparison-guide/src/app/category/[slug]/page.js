@@ -229,9 +229,11 @@ export default function CategoryPage() {
                     <div className="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group-hover:scale-105 overflow-hidden">
                       {provider.logo ? (
                         <div className="aspect-square flex items-center justify-center p-8 bg-gray-50">
-                          <img
+                          <Image
                             src={getStrapiImageUrl(provider.logo)}
                             alt={`${provider.name || 'Provider'} logo`}
+                            width={200}
+                            height={200}
                             className="max-w-full max-h-full object-contain"
                           />
                         </div>
@@ -336,9 +338,11 @@ export default function CategoryPage() {
                           <div className="flex items-center gap-4 p-4 rounded-lg border border-transparent hover:bg-gray-50 hover:border-blue-300 transition-all duration-200">
                             {provider.logo ? (
                               <div className="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm">
-                                <img
+                                <Image
                                   src={getStrapiImageUrl(provider.logo)}
                                   alt={`${provider.name || 'Provider'} logo`}
+                                  width={56}
+                                  height={56}
                                   className="max-w-full max-h-full object-contain"
                                 />
                               </div>
