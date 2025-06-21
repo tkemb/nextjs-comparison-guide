@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { fetchFromStrapi } from '@/lib/api-config';
 import Layout from '@/components/Layout';
 import Breadcrumb from '@/components/Breadcrumb';
