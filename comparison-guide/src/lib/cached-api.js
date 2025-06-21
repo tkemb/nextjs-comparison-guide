@@ -1,17 +1,30 @@
 import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { cacheManager } from '@/lib/local-cache';
 
+// Helper for development-only logging
+const devLog = (message) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(message);
+  }
+};
+
+const devWarn = (message, error) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(message, error);
+  }
+};
+
 // Enhanced API functions with caching
 export const cachedAPI = {
   // Get categories with caching
   async getCategories() {
     const cached = cacheManager.getCategories();
     if (cached) {
-      console.log('Using cached categories');
+      devLog('Using cached categories');
       return cached;
     }
 
-    console.log('Fetching categories from API');
+    devLog('Fetching categories from API');
     const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORIES);
     cacheManager.setCategories(data);
     return data;
@@ -21,11 +34,11 @@ export const cachedAPI = {
   async getCategory(slug) {
     const cached = cacheManager.getCategory(slug);
     if (cached) {
-      console.log(`Using cached category: ${slug}`);
+      devLog(`Using cached category: ${slug}`);
       return cached;
     }
 
-    console.log(`Fetching category from API: ${slug}`);
+    devLog(`Fetching category from API: ${slug}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORY_BY_SLUG(slug));
     cacheManager.setCategory(slug, data);
     return data;
@@ -35,11 +48,11 @@ export const cachedAPI = {
   async getProvider(slug) {
     const cached = cacheManager.getProvider(slug);
     if (cached) {
-      console.log(`Using cached provider: ${slug}`);
+      devLog(`Using cached provider: ${slug}`);
       return cached;
     }
 
-    console.log(`Fetching provider from API: ${slug}`);
+    devLog(`Fetching provider from API: ${slug}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.PROVIDER_BY_SLUG(slug));
     cacheManager.setProvider(slug, data);
     return data;
@@ -49,11 +62,11 @@ export const cachedAPI = {
   async getUseCase(slug) {
     const cached = cacheManager.getUseCase(slug);
     if (cached) {
-      console.log(`Using cached use case: ${slug}`);
+      devLog(`Using cached use case: ${slug}`);
       return cached;
     }
 
-    console.log(`Fetching use case from API: ${slug}`);
+    devLog(`Fetching use case from API: ${slug}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.USE_CASE_BY_SLUG(slug));
     cacheManager.setUseCase(slug, data);
     return data;
@@ -63,11 +76,11 @@ export const cachedAPI = {
   async getProvidersByCategory(categoryId) {
     const cached = cacheManager.getProvidersByCategory(categoryId);
     if (cached) {
-      console.log(`Using cached providers for category: ${categoryId}`);
+      devLog(`Using cached providers for category: ${categoryId}`);
       return cached;
     }
 
-    console.log(`Fetching providers from API for category: ${categoryId}`);
+    devLog(`Fetching providers from API for category: ${categoryId}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(categoryId));
     cacheManager.setProvidersByCategory(categoryId, data);
     return data;
@@ -77,11 +90,11 @@ export const cachedAPI = {
   async getUseCasesByCategory(categoryId) {
     const cached = cacheManager.getUseCasesByCategory(categoryId);
     if (cached) {
-      console.log(`Using cached use cases for category: ${categoryId}`);
+      devLog(`Using cached use cases for category: ${categoryId}`);
       return cached;
     }
 
-    console.log(`Fetching use cases from API for category: ${categoryId}`);
+    devLog(`Fetching use cases from API for category: ${categoryId}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.USE_CASES_BY_CATEGORY(categoryId));
     cacheManager.setUseCasesByCategory(categoryId, data);
     return data;
@@ -97,7 +110,7 @@ export const cachedAPI = {
       const cachedUseCases = cacheManager.getUseCasesByCategory(categoryItem.documentId);
       
       if (cachedProviders && cachedUseCases) {
-        console.log(`Using complete cached data for category: ${slug}`);
+        devLog(`Using complete cached data for category: ${slug}`);
         return {
           category: categoryItem,
           providers: cachedProviders.data || [],
@@ -141,7 +154,7 @@ export const cachedAPI = {
         );
         
         if (cachedCategory && cachedRelated) {
-          console.log(`Using complete cached data for provider: ${slug}`);
+          devLog(`Using complete cached data for provider: ${slug}`);
           return {
             provider: providerItem,
             category: cachedCategory,
@@ -199,7 +212,7 @@ export const cachedAPI = {
         const cachedProviders = cacheManager.getProvidersByCategory(useCaseItem.category.documentId);
         
         if (cachedCategory && cachedProviders) {
-          console.log(`Using complete cached data for use case: ${slug}`);
+          devLog(`Using complete cached data for use case: ${slug}`);
           return {
             useCase: useCaseItem,
             category: cachedCategory,
@@ -243,13 +256,13 @@ export const cachedAPI = {
     if (categoriesCache && categoriesCache.data) {
       const category = categoriesCache.data.find(cat => cat.documentId === categoryId);
       if (category) {
-        console.log(`Found category ${categoryId} in categories cache`);
+        devLog(`Found category ${categoryId} in categories cache`);
         return category;
       }
     }
 
     // Fetch from API
-    console.log(`Fetching category by ID from API: ${categoryId}`);
+    devLog(`Fetching category by ID from API: ${categoryId}`);
     const data = await fetchFromStrapi(`/categories/${categoryId}`);
     return data.data;
   },
@@ -260,7 +273,7 @@ export const cachedAPI = {
       try {
         await this.getCategoryWithRelatedData(slug);
       } catch (error) {
-        console.warn(`Failed to preload category ${slug}:`, error);
+        devWarn(`Failed to preload category ${slug}:`, error);
       }
     }
   },
@@ -270,7 +283,7 @@ export const cachedAPI = {
       try {
         await this.getProviderWithRelatedData(slug);
       } catch (error) {
-        console.warn(`Failed to preload provider ${slug}:`, error);
+        devWarn(`Failed to preload provider ${slug}:`, error);
       }
     }
   },
@@ -280,7 +293,7 @@ export const cachedAPI = {
       try {
         await this.getUseCaseWithRelatedData(slug);
       } catch (error) {
-        console.warn(`Failed to preload use case ${slug}:`, error);
+        devWarn(`Failed to preload use case ${slug}:`, error);
       }
     }
   }

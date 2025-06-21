@@ -85,9 +85,11 @@ export default function ProviderPage() {
     );
   }
 
-  // Debug: Log provider data to see what we're getting
-  console.log('Provider data:', provider);
-  console.log('Provider keys:', Object.keys(provider || {}));
+  // Debug: Log provider data to see what we're getting (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Provider data:', provider);
+    console.log('Provider keys:', Object.keys(provider || {}));
+  }
 
   return (
     <Layout>

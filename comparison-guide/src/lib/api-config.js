@@ -10,8 +10,10 @@ export function buildApiUrl(endpoint) {
 export async function fetchFromStrapi(endpoint, options = {}) {
   const url = buildApiUrl(endpoint);
   
-  // Log the API URL being called
-  console.log(`🌐 Strapi API Call: ${url}`);
+  // Log the API URL being called (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🌐 Strapi API Call: ${url}`);
+  }
   
   try {
     const response = await fetch(url, {
@@ -27,9 +29,12 @@ export async function fetchFromStrapi(endpoint, options = {}) {
     }
 
     const data = await response.json();
-    console.log(`✅ Strapi API Success: ${url}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ Strapi API Success: ${url}`);
+    }
     return data;
   } catch (error) {
+    // Always log errors even in production for debugging
     console.error(`❌ Strapi API error on ${endpoint}:`, error.message);
     throw error;
   }
