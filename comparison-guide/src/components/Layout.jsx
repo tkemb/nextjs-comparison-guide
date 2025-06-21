@@ -10,6 +10,15 @@ export default function Layout({ children }) {
   const [categories, setCategories] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const handleCookiePreferences = (e) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined' && window.CookieConsent) {
+      window.CookieConsent.showPreferences();
+    } else {
+      console.warn('CookieConsent not loaded yet');
+    }
+  };
+
   // Preload category data on hover
   const handleCategoryHover = (categorySlug) => {
     cachedAPI.preloadCategory(categorySlug);
@@ -57,8 +66,11 @@ export default function Layout({ children }) {
                 </div>
                 
                 {showDropdown && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                    <div className="py-2">
+                  <>
+                    {/* Invisible bridge to prevent dropdown from closing */}
+                    <div className="absolute top-full left-0 w-64 h-1 bg-transparent"></div>
+                    <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="py-2">
                       {categories.length > 0 ? (
                         categories.map((category) => (
                           <Link
@@ -73,12 +85,11 @@ export default function Layout({ children }) {
                       ) : (
                         <div className="px-4 py-2 text-gray-500 text-sm">Loading categories...</div>
                       )}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
-              
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link>
             </nav>
           </div>
         </div>
@@ -98,7 +109,10 @@ export default function Layout({ children }) {
               <ul className="space-y-2">
                 <li><Link href="/about" className="text-sm text-gray-600 hover:text-gray-900">About</Link></li>
                 <li><Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy</Link></li>
-                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900" data-cc="show-preferencesModal">View Preferences Modal</Link></li>
+                <li><Link href="/imprint" className="text-sm text-gray-600 hover:text-gray-900">Imprint</Link></li>
+                <li><Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900">Contact</Link></li>
+
+                <li><a href="#" onClick={handleCookiePreferences} className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer">Cookie Consent</a></li>
               </ul>
             </div>
             <div>

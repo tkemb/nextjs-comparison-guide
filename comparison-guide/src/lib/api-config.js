@@ -58,4 +58,8 @@ export const API_ENDPOINTS = {
   // Pages (About, Contact, etc.)
   PAGES: '/pages',
   PAGE_BY_SLUG: (slug) => `/pages?filters[slug][$eq]=${slug}`,
+
+  // Pages (About, Contact, etc.)
+  SINGLE_PAGE_BY_SLUG: (slug) => `/${slug}`,
+
 };

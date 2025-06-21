@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchFromStrapi } from '@/lib/api-config';
 import Layout from '@/components/Layout';
 
 export default function ImprintPage() {
@@ -13,7 +12,8 @@ export default function ImprintPage() {
     const fetchPageData = async () => {
       try {
         const data = await fetchFromStrapi('/imprint');
-        setPageData(data.data || null);
+        // Handle different response structures
+        setPageData(data.data || data || null);
       } catch (error) {
         console.error('Error fetching imprint page:', error);
         setPageData(null);
@@ -54,10 +54,10 @@ export default function ImprintPage() {
             {/* Page Header */}
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                {pageData?.title || 'Imprint'}
+                {pageData?.title}
               </h1>
               <p className="text-xl text-gray-600">
-                Legal information and company details
+                {pageData?.description}
               </p>
             </div>
           </div>
@@ -67,36 +67,7 @@ export default function ImprintPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-white rounded-xl border border-gray-200 p-8">
             <div className="prose max-w-none text-gray-700">
-              {pageData?.content ? (
                 <div dangerouslySetInnerHTML={{ __html: pageData.content }} />
-              ) : (
-                <div>
-                  <h2>Information pursuant to § 5 TMG</h2>
-                  <p>
-                    Software.Fish<br/>
-                    [Your Address]<br/>
-                    [City, Postal Code]<br/>
-                    [Country]
-                  </p>
-                  
-                  <h2>Contact</h2>
-                  <p>
-                    Email: info@software.fish<br/>
-                    Phone: [Your Phone Number]
-                  </p>
-                  
-                  <h2>Responsible for content</h2>
-                  <p>
-                    [Your Name or Company Name]
-                  </p>
-                  
-                  <h2>Disclaimer</h2>
-                  <p>
-                    The information on this website is provided for general informational purposes only. 
-                    We make no warranties about the completeness, reliability and accuracy of this information.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
