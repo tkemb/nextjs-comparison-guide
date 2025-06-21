@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
+import Breadcrumb from '@/components/Breadcrumb';
 import { cachedAPI } from '@/lib/cached-api';
 
 export default function UseCasePage() {
@@ -91,18 +92,13 @@ export default function UseCasePage() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-4 mb-6">
-              <Link href="/" className="text-blue-600 hover:underline">
-                ← Back to Home
-              </Link>
-              {category && (
-                <>
-                  <span className="text-gray-400">/</span>
-                  <Link href={`/category/${category.slug || category.documentId}`} className="text-blue-600 hover:underline">
-                    {category.name}
-                  </Link>
-                </>
-              )}
+            <div className="mb-6">
+              <Breadcrumb 
+                items={[
+                  ...(category ? [{ label: category.name, href: `/category/${category.slug || category.documentId}` }] : []),
+                  { label: useCase?.title || 'Use Case' }
+                ]} 
+              />
             </div>
 
             {/* Use Case Header */}

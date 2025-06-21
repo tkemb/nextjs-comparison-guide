@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { fetchFromStrapi } from '@/lib/api-config';
 import Layout from '@/components/Layout';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export default function AboutPage() {
   const [pageData, setPageData] = useState(null);
@@ -45,10 +47,8 @@ export default function AboutPage() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-4 mb-6">
-              <Link href="/" className="text-blue-600 hover:underline">
-                ← Back to Home
-              </Link>
+            <div className="mb-6">
+              <Breadcrumb items={[{ label: 'About' }]} />
             </div>
 
             {/* Page Header */}

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getStrapiImageUrl } from '@/lib/strapi';
 import Layout from '@/components/Layout';
+import Breadcrumb from '@/components/Breadcrumb';
 import { cachedAPI } from '@/lib/cached-api';
 
 export default function CategoryPage() {
@@ -113,6 +114,11 @@ export default function CategoryPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <Breadcrumb items={[{ label: category.name || 'Category' }]} />
+          </div>
+          
           <h1 className="text-3xl font-bold text-gray-900">
             {category.name || 'Category'}
           </h1>
