@@ -98,6 +98,7 @@ export default function Layout({ children }) {
               <ul className="space-y-2">
                 <li><Link href="/about" className="text-sm text-gray-600 hover:text-gray-900">About</Link></li>
                 <li><Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy</Link></li>
+                <li><Link href="#" className="text-sm text-gray-600 hover:text-gray-900" data-cc="show-preferencesModal">View Preferences Modal</Link></li>
               </ul>
             </div>
             <div>
