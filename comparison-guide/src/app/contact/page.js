@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
+import Link from 'next/link';
 import Layout from '@/components/Layout';
 
 export default function ContactPage() {
@@ -18,8 +18,8 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        const data = await fetchFromStrapi(API_ENDPOINTS.PAGE_BY_SLUG('contact'));
-        setPageData(data.data[0] || null);
+        const data = await fetchFromStrapi('/contact');
+        setPageData(data.data || data || null);
       } catch (error) {
         console.error('Error fetching contact page:', error);
         setPageData(null);
@@ -77,39 +77,65 @@ export default function ContactPage() {
 
   return (
     <Layout>
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Get in Touch</h1>
-            
-            {pageData ? (
-              <div className="prose prose-lg" dangerouslySetInnerHTML={{ __html: pageData.content }} />
-            ) : (
-              <div className="space-y-6">
-                <p className="text-lg text-gray-600">
-                  Have questions about our software directory? Want to suggest a new tool? 
-                  We&apos;d love to hear from you!
-                </p>
+      <div className="bg-gray-50 min-h-screen">
+        {/* Header Section */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-4 mb-6">
+              <Link href="/" className="text-blue-600 hover:underline">
+                ← Back to Home
+              </Link>
+            </div>
+
+            {/* Page Header */}
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                {pageData?.title || 'Contact Us'}
+              </h1>
+              <p className="text-xl text-gray-600">
+                {pageData?.description || 'Get in touch with our team'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Contact Information */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
                 
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Email</h3>
-                    <p className="text-gray-600">hello@software.fish</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Response Time</h3>
-                    <p className="text-gray-600">We typically respond within 24 hours</p>
-                  </div>
+                <div className="prose max-w-none text-gray-700">
+                  {pageData?.content ? (
+                    <div dangerouslySetInnerHTML={{ __html: pageData.content }} />
+                  ) : (
+                    <div className="space-y-6">
+                      <p className="text-lg text-gray-600">
+                        Have questions about our software directory? Want to suggest a new tool? 
+                        We&apos;d love to hear from you!
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">Email</h3>
+                          <p className="text-gray-600">hello@software.fish</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-semibold text-gray-900">Response Time</h3>
+                          <p className="text-gray-600">We typically respond within 24 hours</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Contact Form */}
-          <div>
+              {/* Contact Form */}
+              <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -193,9 +219,11 @@ export default function ContactPage() {
                 </div>
               )}
             </form>
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </Layout>
   );
 }
