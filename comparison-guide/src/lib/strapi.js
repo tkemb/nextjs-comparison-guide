@@ -90,6 +90,25 @@ export async function searchSoftware(searchTerm) {
   return data.data;
 }
 
+// Get provider by slug/identifier for click tracking
+export async function getProvider(providerId) {
+  const query = new URLSearchParams();
+  query.append('filters[slug][$eq]', providerId);
+  query.append('populate', '*');
+
+  const data = await fetchAPI(`/providers?${query.toString()}`);
+  return data.data[0] || null;
+}
+
+// Get all providers for click tracking
+export async function getProviders() {
+  const query = new URLSearchParams();
+  query.append('populate', '*');
+
+  const data = await fetchAPI(`/providers?${query.toString()}`);
+  return data.data;
+}
+
 // Helper function to get image URL
 export function getStrapiImageUrl(imageData) {
   if (!imageData) return null;

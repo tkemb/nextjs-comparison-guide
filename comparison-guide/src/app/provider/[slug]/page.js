@@ -86,6 +86,12 @@ export default function ProviderPage() {
   }
 
   // Debug: Log provider data to see what we're getting (development only)
+  // Generate click tracker URL for provider
+  const getTrackedProviderUrl = (provider) => {        
+    console.log(`Generating tracked URL for provider: ${provider.name || provider.title}`);
+    return `/c?provider=${provider.slug}&source=portal&campaign=provider-page`;
+  };
+
   if (process.env.NODE_ENV === 'development') {
     console.log('Provider data:', provider);
     console.log('Provider keys:', Object.keys(provider || {}));
@@ -168,36 +174,14 @@ export default function ProviderPage() {
 
               {/* Quick Actions - Moved to the right */}
               <div className="flex flex-col gap-3 flex-shrink-0">
-                {provider.link && (
                   <a
-                    href={provider.link}
+                    href={getTrackedProviderUrl(provider)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center whitespace-nowrap"
                   >
-                    Visit Provider
+                    Visit {provider.name || 'Provider'}
                   </a>
-                )}
-                {provider.website && !provider.link && (
-                  <a
-                    href={provider.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center whitespace-nowrap"
-                  >
-                    Visit Website
-                  </a>
-                )}
-                {provider.demo_url && (
-                  <a
-                    href={provider.demo_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-center whitespace-nowrap"
-                  >
-                    Try Demo
-                  </a>
-                )}
               </div>
             </div>
           </div>
@@ -226,11 +210,11 @@ export default function ProviderPage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">About {provider.name || 'This Provider'}</h2>
                   <div className="text-gray-700">
                     <p>No detailed content is available for this provider yet.</p>
-                    {provider.website && (
+                    {(provider.link || provider.website) && (
                       <p className="mt-4">
                         Visit their website for more information: 
-                        <a href={provider.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
-                          {provider.website}
+                        <a href={getTrackedProviderUrl(provider, 'fallback-content')} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                          {provider.website || 'Visit Provider'}
                         </a>
                       </p>
                     )}

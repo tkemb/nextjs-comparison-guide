@@ -9,10 +9,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.1",
+    "drizzle-orm": "^0.44.2",
     "next": "15.3.3",
+    "pg": "^8.16.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vanilla-cookieconsent": "^3.1.0"

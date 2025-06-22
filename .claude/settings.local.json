@@ -5,7 +5,12 @@
       "WebFetch(domain:software.fish)",
       "Bash(find:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(rm:*)",
+      "Bash(npm install:*)",
+      "Bash(touch:*)",
+      "Bash(npm run:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
