@@ -14,7 +14,8 @@ export async function GET(request) {
 
     // Check referrer to ensure proper redirect chain
     const referrer = request.headers.get('referer') || '';
-    const expectedReferrer = new URL('/c', request.url).href;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || new URL(request.url).origin;
+    const expectedReferrer = new URL('/c', baseUrl).href;
     const isReferrerCorrect = referrer.includes('/c');
     
     console.log('Referrer check:', {
@@ -74,7 +75,7 @@ export async function GET(request) {
     <script>
       setTimeout(function() { 
         window.location.href = '${providerUrl}'; 
-      }, 100);
+      }, 1);
     </script>
   </body>
 </html>`,

@@ -14,5 +14,5 @@ export default function CookieConsentWrapper({ children }) {
     return null;
   }
 
-  return children;
+  return <div suppressHydrationWarning>{children}</div>;
 }

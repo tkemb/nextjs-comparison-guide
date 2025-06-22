@@ -91,7 +91,7 @@ export default async function ClickPage({ searchParams }) {
       </head>
       <body>
         <script dangerouslySetInnerHTML={{
-          __html: `setTimeout(function() { window.location.href = '${intermediateUrl}'; }, 100);`
+          __html: `setTimeout(function() { window.location.href = '${intermediateUrl}'; }, 1);`
         }} />
       </body>
     </html>
