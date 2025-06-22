@@ -140,7 +140,8 @@ export default function SearchBar({ className = '' }) {
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search software..."
-            className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 pl-10 pr-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ fontSize: '16px' }}
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +152,7 @@ export default function SearchBar({ className = '' }) {
       </form>
 
       {showSuggestions && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto overflow-x-hidden">
           {loading ? (
             <div className="px-4 py-2 text-sm text-gray-500">Searching...</div>
           ) : suggestions.length > 0 ? (
@@ -207,7 +208,7 @@ export default function SearchBar({ className = '' }) {
                   onClick={handleSubmit}
                   className="px-4 py-2 cursor-pointer hover:bg-gray-50 border-t border-gray-100"
                 >
-                  <div className="text-sm text-blue-600">
+                  <div className="text-sm text-blue-600 truncate">
                     Search for "{searchTerm}"
                   </div>
                 </div>
