@@ -114,7 +114,7 @@ export default function ProviderPage() {
             </div>
 
             {/* Provider Header */}
-            <div className="flex items-start justify-between gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
               <div className="flex items-start gap-6 flex-1">
                 {/* Logo */}
                 {provider.logo && (
@@ -173,7 +173,7 @@ export default function ProviderPage() {
               </div>
 
               {/* Quick Actions - Moved to the right */}
-              <div className="flex flex-col gap-3 flex-shrink-0">
+              <div className="flex flex-col gap-3 sm:flex-shrink-0">
                   <a
                     href={getTrackedProviderUrl(provider)}
                     target="_blank"
