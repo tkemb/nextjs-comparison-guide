@@ -1,19 +1,19 @@
-import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 
-// Click handler page - returns HTML with meta refresh for proper referrer
-export default async function ClickPage({ searchParams }) {
-  // Await searchParams in Next.js 15
-  const params = await searchParams;
+// Click handler page - returns pure HTML with meta refresh for proper referrer
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  // Convert URLSearchParams to object
+  const params = Object.fromEntries(searchParams.entries());
   
   // Generate unique alphanumeric click ID
   const uniqueClickId = generateAlphanumericId();
   
   // Get request headers for tracking data
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') || '';
-  const referrer = headersList.get('referer') || '';
-  const xForwardedFor = headersList.get('x-forwarded-for');
-  const xRealIp = headersList.get('x-real-ip');
+  const userAgent = request.headers.get('user-agent') || '';
+  const referrer = request.headers.get('referer') || '';
+  const xForwardedFor = request.headers.get('x-forwarded-for');
+  const xRealIp = request.headers.get('x-real-ip');
   const ipAddress = xForwardedFor?.split(',')[0] || xRealIp || 'unknown';
 
   // Extract Zeropark tracking tokens from URL parameters
@@ -81,20 +81,31 @@ export default async function ClickPage({ searchParams }) {
   // Build intermediate URL with click ID and provider
   const intermediateUrl = `/c/i?clickId=${uniqueClickId}&provider=${params.provider || 'default'}`;
   
-  // Return HTML with meta refresh for proper referrer setting
-  return (
-    <html>
-      <head>
-        <meta httpEquiv="refresh" content={`0; url=${intermediateUrl}`} />
-        <meta name="robots" content="noindex, nofollow" />
-        <title>Redirecting...</title>
-      </head>
-      <body>
-        <script dangerouslySetInnerHTML={{
-          __html: `setTimeout(function() { window.location.href = '${intermediateUrl}'; }, 1);`
-        }} />
-      </body>
-    </html>
+  // Return pure HTML with meta refresh for proper referrer setting
+  return new NextResponse(
+    `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=${intermediateUrl}">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <script>
+      setTimeout(function() { 
+        window.location.href = '${intermediateUrl}'; 
+      }, 1);
+    </script>
+  </body>
+</html>`,
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      }
+    }
   );
 }
 
