@@ -17,7 +17,7 @@ function SearchContent() {
 
   useEffect(() => {
     const performSearch = async () => {
-      if (!query || query.trim().length < 2) {
+      if (!query || query.trim().length < 1) {
         setResults({ categories: [], providers: [] });
         setLoading(false);
         return;
@@ -78,14 +78,14 @@ function SearchContent() {
             <div className="text-center py-12">
               <p className="text-red-600 mb-4">{error}</p>
             </div>
-          ) : !query || query.trim().length < 2 ? (
+          ) : !query || query.trim().length < 1 ? (
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Enter a search term</h3>
-                <p className="text-gray-600">Please enter at least 2 characters to search for categories and providers.</p>
+                <p className="text-gray-600">Please enter at least 1 characters to search for categories and providers.</p>
               </div>
             </div>
           ) : totalResults === 0 ? (
