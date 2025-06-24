@@ -189,10 +189,10 @@ export default function ProviderPage() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
             {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-3 space-y-8">
               
               {/* About Section - Using provider.content */}
               {provider.content && (
@@ -268,7 +268,7 @@ export default function ProviderPage() {
 
             {/* Sticky Sidebar - Same as Category Page */}
             <div className="lg:col-span-1">
-              <div className="sticky top-8">
+              <div className="sticky top-24 z-40">
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     {category ? `Other ${category.name} Providers` : 'Related Providers'}
