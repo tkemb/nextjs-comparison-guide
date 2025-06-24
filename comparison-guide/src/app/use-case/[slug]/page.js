@@ -272,7 +272,7 @@ export default function UseCasePage() {
 
             {/* Sticky Sidebar - Same as Category and Provider Pages */}
             <div className="lg:col-span-1">
-              <div className="sticky top-8">
+              <div className="sticky top-24 z-40">
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     {category ? `Top ${category.name} Providers` : 'Related Providers'}

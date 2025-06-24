@@ -20,3 +20,24 @@ body {
   width: 100%;
   position: relative;
 }
+
+/* Sticky header enhancements */
+header.sticky {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Ensure proper z-index for dropdowns when header is sticky */
+.sticky .dropdown-menu {
+  z-index: 60;
+}
+
+/* Mobile-specific adjustments for sticky header */
+@media (max-width: 768px) {
+  header.sticky {
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+}
