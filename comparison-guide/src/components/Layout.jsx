@@ -175,7 +175,7 @@ export default function Layout({ children }) {
                     </svg>
                     Categories
                   </div>
-                  <div className="space-y-1 pl-3 border-l-2 border-gray-100">
+                  <div className="space-y-1 pl-3 border-l border-gray-200">
                     {categories.length > 0 ? (
                       categories.map((category) => (
                         <Link

@@ -1,6 +1,9 @@
 import { fetchFromStrapi, API_ENDPOINTS } from '@/lib/api-config';
 import { cacheManager } from '@/lib/local-cache';
 
+// Check if caching is enabled via environment variable
+const CACHE_ENABLED = process.env.NEXT_PUBLIC_ENABLE_CACHE !== 'false';
+
 // Helper for development-only logging
 const devLog = (message) => {
   if (process.env.NODE_ENV === 'development') {
@@ -14,108 +17,122 @@ const devWarn = (message, error) => {
   }
 };
 
+// Helper to check cache if enabled
+const getCachedData = (cacheGetter) => {
+  return CACHE_ENABLED ? cacheGetter() : null;
+};
+
+// Helper to set cache if enabled
+const setCachedData = (cacheSetter, ...args) => {
+  if (CACHE_ENABLED) {
+    cacheSetter(...args);
+  }
+};
+
 // Enhanced API functions with caching
 export const cachedAPI = {
   // Get categories with caching
   async getCategories() {
-    const cached = cacheManager.getCategories();
+    const cached = getCachedData(() => cacheManager.getCategories());
     if (cached) {
       devLog('Using cached categories');
       return cached;
     }
 
-    devLog('Fetching categories from API');
+    devLog(`Fetching categories from API${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORIES);
-    cacheManager.setCategories(data);
+    setCachedData(cacheManager.setCategories.bind(cacheManager), data);
     return data;
   },
 
   // Get category by slug with caching
   async getCategory(slug) {
-    const cached = cacheManager.getCategory(slug);
+    const cached = getCachedData(() => cacheManager.getCategory(slug));
     if (cached) {
       devLog(`Using cached category: ${slug}`);
       return cached;
     }
 
-    devLog(`Fetching category from API: ${slug}`);
+    devLog(`Fetching category from API: ${slug}${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.CATEGORY_BY_SLUG(slug));
-    cacheManager.setCategory(slug, data);
+    setCachedData(cacheManager.setCategory.bind(cacheManager), slug, data);
     return data;
   },
 
   // Get provider by slug with caching
   async getProvider(slug) {
-    const cached = cacheManager.getProvider(slug);
+    const cached = getCachedData(() => cacheManager.getProvider(slug));
     if (cached) {
       devLog(`Using cached provider: ${slug}`);
       return cached;
     }
 
-    devLog(`Fetching provider from API: ${slug}`);
+    devLog(`Fetching provider from API: ${slug}${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.PROVIDER_BY_SLUG(slug));
-    cacheManager.setProvider(slug, data);
+    setCachedData(cacheManager.setProvider.bind(cacheManager), slug, data);
     return data;
   },
 
   // Get use case by slug with caching
   async getUseCase(slug) {
-    const cached = cacheManager.getUseCase(slug);
+    const cached = getCachedData(() => cacheManager.getUseCase(slug));
     if (cached) {
       devLog(`Using cached use case: ${slug}`);
       return cached;
     }
 
-    devLog(`Fetching use case from API: ${slug}`);
+    devLog(`Fetching use case from API: ${slug}${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.USE_CASE_BY_SLUG(slug));
-    cacheManager.setUseCase(slug, data);
+    setCachedData(cacheManager.setUseCase.bind(cacheManager), slug, data);
     return data;
   },
 
   // Get providers by category with caching
   async getProvidersByCategory(categoryId) {
-    const cached = cacheManager.getProvidersByCategory(categoryId);
+    const cached = getCachedData(() => cacheManager.getProvidersByCategory(categoryId));
     if (cached) {
       devLog(`Using cached providers for category: ${categoryId}`);
       return cached;
     }
 
-    devLog(`Fetching providers from API for category: ${categoryId}`);
+    devLog(`Fetching providers from API for category: ${categoryId}${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.PROVIDERS_BY_CATEGORY(categoryId));
-    cacheManager.setProvidersByCategory(categoryId, data);
+    setCachedData(cacheManager.setProvidersByCategory.bind(cacheManager), categoryId, data);
     return data;
   },
 
   // Get use cases by category with caching
   async getUseCasesByCategory(categoryId) {
-    const cached = cacheManager.getUseCasesByCategory(categoryId);
+    const cached = getCachedData(() => cacheManager.getUseCasesByCategory(categoryId));
     if (cached) {
       devLog(`Using cached use cases for category: ${categoryId}`);
       return cached;
     }
 
-    devLog(`Fetching use cases from API for category: ${categoryId}`);
+    devLog(`Fetching use cases from API for category: ${categoryId}${CACHE_ENABLED ? ' (cache enabled)' : ' (cache disabled)'}`);
     const data = await fetchFromStrapi(API_ENDPOINTS.USE_CASES_BY_CATEGORY(categoryId));
-    cacheManager.setUseCasesByCategory(categoryId, data);
+    setCachedData(cacheManager.setUseCasesByCategory.bind(cacheManager), categoryId, data);
     return data;
   },
 
   // Get category details with related data (optimized batch fetch)
   async getCategoryWithRelatedData(slug) {
-    // Check if complete category data is cached
-    const cachedCategory = cacheManager.getCategory(slug);
-    if (cachedCategory && cachedCategory.data && cachedCategory.data.length > 0) {
-      const categoryItem = cachedCategory.data[0];
-      const cachedProviders = cacheManager.getProvidersByCategory(categoryItem.documentId);
-      const cachedUseCases = cacheManager.getUseCasesByCategory(categoryItem.documentId);
-      
-      if (cachedProviders && cachedUseCases) {
-        devLog(`Using complete cached data for category: ${slug}`);
-        return {
-          category: categoryItem,
-          providers: cachedProviders.data || [],
-          useCases: cachedUseCases.data || []
-        };
+    // Check if complete category data is cached (only if cache is enabled)
+    if (CACHE_ENABLED) {
+      const cachedCategory = cacheManager.getCategory(slug);
+      if (cachedCategory && cachedCategory.data && cachedCategory.data.length > 0) {
+        const categoryItem = cachedCategory.data[0];
+        const cachedProviders = cacheManager.getProvidersByCategory(categoryItem.documentId);
+        const cachedUseCases = cacheManager.getUseCasesByCategory(categoryItem.documentId);
+        
+        if (cachedProviders && cachedUseCases) {
+          devLog(`Using complete cached data for category: ${slug}`);
+          return {
+            category: categoryItem,
+            providers: cachedProviders.data || [],
+            useCases: cachedUseCases.data || []
+          };
+        }
       }
     }
 
@@ -142,24 +159,26 @@ export const cachedAPI = {
 
   // Get provider with related data (optimized batch fetch)
   async getProviderWithRelatedData(slug) {
-    const cachedProvider = cacheManager.getProvider(slug);
-    if (cachedProvider && cachedProvider.data && cachedProvider.data.length > 0) {
-      const providerItem = cachedProvider.data[0];
-      
-      if (providerItem?.category?.documentId) {
-        const cachedCategory = await this.getCategoryById(providerItem.category.documentId);
-        const cachedRelated = cacheManager.getRelatedProviders(
-          providerItem.category.documentId, 
-          providerItem.documentId
-        );
+    if (CACHE_ENABLED) {
+      const cachedProvider = cacheManager.getProvider(slug);
+      if (cachedProvider && cachedProvider.data && cachedProvider.data.length > 0) {
+        const providerItem = cachedProvider.data[0];
         
-        if (cachedCategory && cachedRelated) {
-          devLog(`Using complete cached data for provider: ${slug}`);
-          return {
-            provider: providerItem,
-            category: cachedCategory,
-            relatedProviders: cachedRelated
-          };
+        if (providerItem?.category?.documentId) {
+          const cachedCategory = await this.getCategoryById(providerItem.category.documentId);
+          const cachedRelated = cacheManager.getRelatedProviders(
+            providerItem.category.documentId, 
+            providerItem.documentId
+          );
+          
+          if (cachedCategory && cachedRelated) {
+            devLog(`Using complete cached data for provider: ${slug}`);
+            return {
+              provider: providerItem,
+              category: cachedCategory,
+              relatedProviders: cachedRelated
+            };
+          }
         }
       }
     }
@@ -186,7 +205,8 @@ export const cachedAPI = {
           .filter(p => p.documentId !== providerItem.documentId);
         
         // Cache the filtered related providers
-        cacheManager.setRelatedProviders(
+        setCachedData(
+          cacheManager.setRelatedProviders.bind(cacheManager),
           providerItem.category.documentId,
           providerItem.documentId,
           relatedProviders
@@ -203,21 +223,23 @@ export const cachedAPI = {
 
   // Get use case with related data (optimized batch fetch)
   async getUseCaseWithRelatedData(slug) {
-    const cachedUseCase = cacheManager.getUseCase(slug);
-    if (cachedUseCase && cachedUseCase.data && cachedUseCase.data.length > 0) {
-      const useCaseItem = cachedUseCase.data[0];
-      
-      if (useCaseItem?.category?.documentId) {
-        const cachedCategory = await this.getCategoryById(useCaseItem.category.documentId);
-        const cachedProviders = cacheManager.getProvidersByCategory(useCaseItem.category.documentId);
+    if (CACHE_ENABLED) {
+      const cachedUseCase = cacheManager.getUseCase(slug);
+      if (cachedUseCase && cachedUseCase.data && cachedUseCase.data.length > 0) {
+        const useCaseItem = cachedUseCase.data[0];
         
-        if (cachedCategory && cachedProviders) {
-          devLog(`Using complete cached data for use case: ${slug}`);
-          return {
-            useCase: useCaseItem,
-            category: cachedCategory,
-            relatedProviders: cachedProviders.data || []
-          };
+        if (useCaseItem?.category?.documentId) {
+          const cachedCategory = await this.getCategoryById(useCaseItem.category.documentId);
+          const cachedProviders = cacheManager.getProvidersByCategory(useCaseItem.category.documentId);
+          
+          if (cachedCategory && cachedProviders) {
+            devLog(`Using complete cached data for use case: ${slug}`);
+            return {
+              useCase: useCaseItem,
+              category: cachedCategory,
+              relatedProviders: cachedProviders.data || []
+            };
+          }
         }
       }
     }
@@ -251,13 +273,15 @@ export const cachedAPI = {
 
   // Helper: Get category by ID
   async getCategoryById(categoryId) {
-    // Try to find in categories cache first
-    const categoriesCache = cacheManager.getCategories();
-    if (categoriesCache && categoriesCache.data) {
-      const category = categoriesCache.data.find(cat => cat.documentId === categoryId);
-      if (category) {
-        devLog(`Found category ${categoryId} in categories cache`);
-        return category;
+    // Try to find in categories cache first (only if cache is enabled)
+    if (CACHE_ENABLED) {
+      const categoriesCache = cacheManager.getCategories();
+      if (categoriesCache && categoriesCache.data) {
+        const category = categoriesCache.data.find(cat => cat.documentId === categoryId);
+        if (category) {
+          devLog(`Found category ${categoryId} in categories cache`);
+          return category;
+        }
       }
     }
 
@@ -267,9 +291,9 @@ export const cachedAPI = {
     return data.data;
   },
 
-  // Preload functions (non-blocking)
+  // Preload functions (non-blocking) - only if cache is enabled
   async preloadCategory(slug) {
-    if (!cacheManager.getCategory(slug)) {
+    if (CACHE_ENABLED && !cacheManager.getCategory(slug)) {
       try {
         await this.getCategoryWithRelatedData(slug);
       } catch (error) {
@@ -279,7 +303,7 @@ export const cachedAPI = {
   },
 
   async preloadProvider(slug) {
-    if (!cacheManager.getProvider(slug)) {
+    if (CACHE_ENABLED && !cacheManager.getProvider(slug)) {
       try {
         await this.getProviderWithRelatedData(slug);
       } catch (error) {
@@ -289,7 +313,7 @@ export const cachedAPI = {
   },
 
   async preloadUseCase(slug) {
-    if (!cacheManager.getUseCase(slug)) {
+    if (CACHE_ENABLED && !cacheManager.getUseCase(slug)) {
       try {
         await this.getUseCaseWithRelatedData(slug);
       } catch (error) {

@@ -3,10 +3,57 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getStrapiImageUrl } from '@/lib/strapi';
+import { cachedAPI } from '@/lib/cached-api';
 
-export default function CategoriesSection({ categories }) {
+export default function CategoriesSection({ categories: initialCategories }) {
+  const [categories, setCategories] = useState(initialCategories || []);
+  const [loading, setLoading] = useState(!initialCategories);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const fetchedCategories = await cachedAPI.getCategories();
+        setCategories(fetchedCategories || []);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!initialCategories || initialCategories.length === 0) {
+      fetchCategories();
+    }
+  }, [initialCategories]);
+
+  if (loading) {
+    return (
+      <section className="py-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, index) => (
+            <div key={index} className="bg-gray-200 rounded-lg h-32 animate-pulse"></div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-8">
+        <div className="text-center text-red-600">
+          <p>Failed to load categories. Please try again later.</p>
+        </div>
+      </section>
+    );
+  }
+
   if (!categories || categories.length === 0) {
     return null;
   }
@@ -43,7 +90,6 @@ function CategoryCard({ name, slug, documentId, imageUrl }) {
     setImageError(true);
   };
 
-  const showImage = imageUrl && !imageError;
 
   return (
     <Link href={`/category/${slug || documentId}`} className="group">
