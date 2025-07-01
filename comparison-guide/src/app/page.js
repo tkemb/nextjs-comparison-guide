@@ -14,7 +14,7 @@ export default async function HomePage() {
       <section className="bg-white py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            We help you find the right software
+            We help you make the right decision
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover and compare software tools across different categories. Find the perfect solution for your needs.

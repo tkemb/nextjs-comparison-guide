@@ -88,7 +88,7 @@ export default function Layout({ children }) {
                     <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                       <div className="py-2">
                       {categories.length > 0 ? (
-                        categories.map((category) => (
+                        categories.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((category) => (
                           <Link
                             key={category.documentId}
                             href={`/category/${category.slug || category.documentId}`}
