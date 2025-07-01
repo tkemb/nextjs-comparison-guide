@@ -20,14 +20,9 @@ const nextConfig: NextConfig = {
         hostname: 'localhost',
         port: '1337',
         pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-        port: '1337',
-        pathname: '/**',
       }
     ],
+    unoptimized: process.env.NODE_ENV === 'production',
   },
 };
 

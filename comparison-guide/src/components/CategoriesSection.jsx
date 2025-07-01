@@ -86,7 +86,8 @@ export default function CategoriesSection({ categories: initialCategories }) {
 function CategoryCard({ name, slug, documentId, imageUrl }) {
   const [imageError, setImageError] = useState(false);
 
-  const handleImageError = () => {
+  const handleImageError = (e) => {
+    console.error('Image failed to load:', imageUrl, e);
     setImageError(true);
   };
 
@@ -95,12 +96,18 @@ function CategoryCard({ name, slug, documentId, imageUrl }) {
     <Link href={`/category/${slug || documentId}`} className="group">
       <div className="relative bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden h-32 group-hover:scale-105">
         <div className="absolute inset-0">
-          <img
-            src={imageUrl}
-            alt={name}
-            onError={handleImageError}
-            className="w-full h-full object-cover"
-          />
+          {!imageError && imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={name}
+              onError={handleImageError}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center text-center p-2">
+              <span className="text-gray-400 text-sm font-medium">{name}</span>
+            </div>
+          )}
         </div>
      
         {/* Screen reader text */}
