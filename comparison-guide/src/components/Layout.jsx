@@ -114,7 +114,10 @@ export default function Layout({ children }) {
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900"
+                aria-controls="mobile-menu"
+                aria-expanded={showMobileMenu}
               >
+                <span className="sr-only">Open main menu</span>
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {showMobileMenu ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -138,7 +141,7 @@ export default function Layout({ children }) {
           ></div>
           
           {/* Side Menu */}
-          <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50 flex flex-col md:hidden transform transition-transform duration-300 ease-in-out ${showMobileMenu ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div id="mobile-menu" className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50 flex flex-col md:hidden transform transition-transform duration-300 ease-in-out ${showMobileMenu ? 'translate-x-0' : 'translate-x-full'}`}>
             {/* Menu Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
