@@ -109,6 +109,26 @@ export async function getProviders() {
   return data.data;
 }
 
+// Get PPC landing page by subdomain
+export async function getPPCLandingPage(subdomain) {
+  const query = new URLSearchParams();
+  query.append('filters[subdomain][$eq]', subdomain);
+  query.append('populate', 'placements.provider');
+
+  const data = await fetchAPI(`/ppc-landingpages?${query.toString()}`);
+  console.log('🔍 PPC Landing Page data with placements.provider:', JSON.stringify(data.data[0], null, 2));
+  return data.data[0] || null;
+}
+
+// Get all PPC landing pages
+export async function getPPCLandingPages() {
+  const query = new URLSearchParams();
+  query.append('populate', '*');
+
+  const data = await fetchAPI(`/ppc-landingpages?${query.toString()}`);
+  return data.data;
+}
+
 // Helper function to get image URL
 export function getStrapiImageUrl(imageData) {
   if (!imageData) return null;

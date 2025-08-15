@@ -37,7 +37,10 @@ export default function RootLayout({
       
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       > 
-        <Script src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.umd.js" strategy="beforeInteractive" />
+        <Script 
+          src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.js" 
+          strategy="beforeInteractive" 
+        />
         <Script src="/cookieconsent-config.js" strategy="afterInteractive" />
         {children}
       </body>
